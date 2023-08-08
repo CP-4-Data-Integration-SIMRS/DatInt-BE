@@ -4,15 +4,21 @@ import (
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
+	"github.com/vier21/simrs-cdc-monitoring/bin/module/monitor/usecase"
 )
 
-func InitHttpHandler(r *chi.Mux) {
-	r.Get("/api/v1/monitor", GetMonitorDataHandler)
+type httpHandler struct {
+	hcUsecase *usecase.HCUsecase
 }
 
-func GetMonitorDataHandler(w http.ResponseWriter, r *http.Request) {
+func InitMonitorHttpHandler(r *chi.Mux, uc *usecase.HCUsecase) {
+	handler := &httpHandler{
+		hcUsecase: uc,
+	}
+
+	r.Get("/api/v1/monitor", handler.GetMonitorDataHandler)
+}
+
+func (h *httpHandler) GetMonitorDataHandler(w http.ResponseWriter, r *http.Request) {
 	
 }
-
-
-
