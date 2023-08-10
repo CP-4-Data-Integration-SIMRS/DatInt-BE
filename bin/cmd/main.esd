@@ -1,0 +1,84 @@
+package main
+
+import (
+	"fmt"
+	"log"
+
+	_ "github.com/go-sql-driver/mysql"
+	"github.com/jmoiron/sqlx"
+)
+
+type DatabaseInfo struct {
+	DBName     string
+	TableInfo  []Table
+	TotalTable int
+}
+
+type Table struct {
+	TableName   string
+	TotalRecord int
+}
+
+func main() {
+
+	db, err := sqlx.Connect("mysql", "root@tcp(127.0.0.1:3306)/")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer db.Close()
+	databases := []string{}
+
+	var dbsInfo []DatabaseInfo
+	db.Select(&databases, "SHOW DATABASES")
+
+	for i := range databases {
+		if databases[i] != "information_schema" && databases[i] != "performance_schema" && databases[i] != "phpmyadmin" && databases[i] != "mysql" && databases[i] != "dms-project2" {
+			var dbinfo DatabaseInfo
+			var totaltable int
+			if err := db.Get(&totaltable, "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = ? ", databases[i]); err != nil {
+				log.Println(err)
+				return
+			}
+			var tbname []string
+
+			if err := db.Select(&tbname, "SELECT TABLE_NAME FROM information_schema.TABLES WHERE TABLE_SCHEMA = ?", databases[i]); err != nil {
+				log.Println(err)
+				log.Println("error disini")
+				return
+			}
+
+			var tables []Table
+
+			for j := range tbname {
+				totalrecord := 0
+				query := fmt.Sprintf("SELECT COUNT(*) FROM %s.%s", databases[i], tbname[j])
+
+				if err := db.Get(&totalrecord, query); err != nil {
+					log.Println(err)
+					log.Println("error disini2 ", tbname[j])
+					return
+				}
+				table := Table{
+					TableName:   tbname[j],
+					TotalRecord: totalrecord,
+				}
+				tables = append(tables, table)
+			}
+
+			dbinfo = DatabaseInfo{
+				DBName:     databases[i],
+				TableInfo:  tables,
+				TotalTable: totaltable,
+			}
+
+			dbsInfo = append(dbsInfo, dbinfo)
+
+		}
+	}
+
+	for i := range dbsInfo {
+		fmt.Printf("dbname: %s\n tableinfo: %s\n totaltable:%d\n", dbsInfo[i].DBName, dbsInfo[i].TableInfo, dbsInfo[i].TotalTable)
+		fmt.Println("----")
+	}
+
+}

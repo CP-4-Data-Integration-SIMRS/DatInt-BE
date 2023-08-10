@@ -11,9 +11,9 @@ import (
 
 type HCRepositoryInterface interface {
 	GetAllDB() ([]string, error)
-	GetTotalTablesByDBName(dbname string) (int, error)
-	CountTableRecords(dbname string, tablename string) (int, error)
 	GetAllTableByDB(dbname string) ([]string, error)
+	CountTotalTablesByDBName(dbname string) (int, error)
+	CountTableRecords(dbname string, tablename string) (int, error)
 	CountNewData(dbname string) (int, error)
 	CountDeltaData(dbname string) (int, error)
 }
@@ -39,7 +39,7 @@ func (h *HCRepository) GetAllDB() ([]string, error) {
 	return dbs, nil
 }
 
-func (h *HCRepository) GetTotalTablesByDBName(dbname string) (int, error) {
+func (h *HCRepository) CountTotalTablesByDBName(dbname string) (int, error) {
 	var count int
 
 	if err := h.db.Get(&count, "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = ?", dbname); err != nil {
