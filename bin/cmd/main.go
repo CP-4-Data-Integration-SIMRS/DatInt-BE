@@ -24,7 +24,7 @@ func main() {
 	m := chi.NewRouter()
 
 	RunServer(m)
-
+	
 	server := http.Server{
 		Addr:         config.GetConfig().ServerPort,
 		Handler:      m,

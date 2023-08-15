@@ -11,4 +11,7 @@ require (
 	github.com/joho/godotenv v1.5.1
 )
 
-require github.com/elastic/elastic-transport-go/v8 v8.0.0-20230329154755-1a3c63de0db6 // indirect
+require (
+	github.com/elastic/elastic-transport-go/v8 v8.0.0-20230329154755-1a3c63de0db6 // indirect
+	github.com/elastic/go-elasticsearch/v7 v7.17.10 // indirect
+)
