@@ -3,22 +3,21 @@ package repository
 import (
 	"context"
 	"encoding/json"
+
 	//"strings"
-	"time"
-	"log"
 	"bytes"
+	"log"
+	"time"
 
-
-	"github.com/google/uuid"
 	"github.com/elastic/go-elasticsearch/v8"
 	"github.com/elastic/go-elasticsearch/v8/esapi"
+	"github.com/google/uuid"
 	"github.com/vier21/simrs-cdc-monitoring/bin/module/log/model"
 	"github.com/vier21/simrs-cdc-monitoring/bin/pkg/elastic"
 )
 
 type LogRepositoryInterface interface {
 	GetLogs() ([]model.LogData, error)
-	
 }
 
 type LogRepository struct {
@@ -33,14 +32,14 @@ func NewLogRepository() *LogRepository {
 
 func (lr *LogRepository) GetLogs() ([]model.LogData, error) {
 	var logs []model.LogData
-	cfg := elasticsearch.Config{
-		Addresses: []string{"http://localhost:9200"}, 
-	}
+	// cfg := elasticsearch.Config{
+	// 	Addresses: []string{"http://localhost:9200"},
+	// }
 
-	es, err := elasticsearch.NewClient(cfg)
-	if err != nil {
-		log.Fatalf("Error creating the client: %s", err)
-	}
+	// es, err := elasticsearch.NewClient(cfg)
+	// if err != nil {
+	// 	log.Fatalf("Error creating the client: %s", err)
+	// }
 
 	searchBody := `
 	{
@@ -50,11 +49,11 @@ func (lr *LogRepository) GetLogs() ([]model.LogData, error) {
 	}
 	`
 	req := esapi.SearchRequest{
-		Index: []string{"logindex"}, // Ganti dengan nama indeks Anda
+		Index: []string{"logindex"},
 		Body:  bytes.NewReader([]byte(searchBody)),
 	}
 
-	res, err := req.Do(context.Background(), es)
+	res, err := req.Do(context.Background(), lr.es)
 	if err != nil {
 		log.Fatalf("Error performing search request: %s", err)
 	}
@@ -71,20 +70,19 @@ func (lr *LogRepository) GetLogs() ([]model.LogData, error) {
 
 	hits := response["hits"].(map[string]interface{})["hits"].([]interface{})
 	for _, hit := range hits {
-			source := hit.(map[string]interface{})["_source"].(map[string]interface{})
-		
-		
-			log := model.LogData{
-				Healthcare: source["Healthcare"].(string),
-				DBName:     source["DBName"].(string),
-				TBName:     source["TBName"].(string),
-				Status:     source["Status"].(string),
-				DateTime:   time.Now(),
-				CreatedAt:  time.Now(),
-				RecordID:   uuid.New(),
-			}
-			logs = append(logs, log)
+		source := hit.(map[string]interface{})["_source"].(map[string]interface{})
+
+		log := model.LogData{
+			Healthcare: source["Healthcare"].(string),
+			DBName:     source["DBName"].(string),
+			TBName:     source["TBName"].(string),
+			Status:     source["Status"].(string),
+			DateTime:   time.Now(),
+			CreatedAt:  time.Now(),
+			RecordID:   uuid.New(),
 		}
+		logs = append(logs, log)
+	}
 
 	return logs, nil
 }

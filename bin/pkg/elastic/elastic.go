@@ -8,21 +8,25 @@ import (
 
 var ESCli *elasticsearch.Client
 
-func InitElastic() {
+func InitElastic() (err error) {
 
-	es, err := elasticsearch.NewDefaultClient()
+	cfg := elasticsearch.Config{
+		Addresses: []string{"http://localhost:9200"},
+	}
+
+	ESCli, err = elasticsearch.NewClient(cfg)
+	if err != nil {
+		log.Fatalf("Error creating the client: %s", err)
+		return
+	}
+
+	res, err := ESCli.Ping()
 
 	if err != nil {
 		log.Fatal(err)
 		return
 	}
 
-	res, err := es.Ping()
-
-	if err != nil {
-		log.Fatal(err)
-		return
-	}
-
-	log.Println(res)
+	log.Printf("ElasticSearch Connected %s",res)
+	return
 }
