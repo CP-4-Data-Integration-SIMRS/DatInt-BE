@@ -25,6 +25,7 @@ func InitMonitorHttpHandler(r *chi.Mux, uc *usecase.HCUsecase) {
 	}
 
 	r.Get("/api/v1/monitor", handler.GetMonitorDataHandler)
+	r.Get("/api/v1/{dbname}/monitor", handler.GetDBInfo)
 }
 
 func (h *httpHandler) GetMonitorDataHandler(w http.ResponseWriter, r *http.Request) {
@@ -51,4 +52,33 @@ func (h *httpHandler) GetMonitorDataHandler(w http.ResponseWriter, r *http.Reque
 		})
 		return
 	}
+}
+
+func (h *httpHandler) GetDBInfo(w http.ResponseWriter, r *http.Request) {
+	w.Header().Add("Content-Type", "application/json")
+	dbname := chi.URLParam(r, "dbname")
+
+	data, err := h.hcUsecase.GetDBInfo(dbname)
+
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(MonitorResponse{
+			Status: fmt.Sprintf("db not found: %s (%s)", err.Error(), strconv.Itoa(http.StatusBadRequest)),
+			Data:   nil,
+		})
+		return
+	}
+
+	if err := json.NewEncoder(w).Encode(MonitorResponse{
+		Status: fmt.Sprintf("Success (%s)", strconv.Itoa(http.StatusOK)),
+		Data:   data,
+	}); err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(MonitorResponse{
+			Status: fmt.Sprintf("error fetching data: %s (%s)", err.Error(), strconv.Itoa(http.StatusInternalServerError)),
+			Data:   nil,
+		})
+		return
+	}
+
 }
