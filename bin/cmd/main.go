@@ -27,7 +27,7 @@ func main() {
 	RunServer(m)
 
 	server := http.Server{
-		Addr:         config.GetConfig().ServerPort,
+		Addr:         ":3030",
 		Handler:      m,
 		IdleTimeout:  10 * time.Second,
 		ReadTimeout:  15 * time.Second,

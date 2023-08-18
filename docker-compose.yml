@@ -1,0 +1,35 @@
+version: '3'
+services:
+  db:
+    image: mysql
+    restart: always
+    environment:
+      - MYSQL_DATABASE=rs_mitra
+      - MYSQL_ALLOW_EMPTY_PASSWORD=yes
+    ports:
+      - '3306:3306'
+    volumes:
+      - db:/var/lib/mysql
+      - ./migration/sik.sql:/docker-entrypoint-initdb.d/init.sql
+  elasticsearch:
+    image: elasticsearch:8.8.0
+    ports:
+      - 9200:9200
+      - 9300:9300
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+  backend:
+    build:
+      context: .
+      target: prod
+    environment:
+      - SERVER_PORT=${SERVER_PORT}
+      - MYSQL_DB=${MYSQL_DB}
+      - MYSQL_DB_DRIVER=${MYSQL_DB_DRIVER}
+    depends_on:
+      - db
+      - elasticsearch
+volumes:
+  db:
+    driver: local
