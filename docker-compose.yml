@@ -19,17 +19,6 @@ services:
     environment:
       - discovery.type=single-node
       - xpack.security.enabled=false
-  backend:
-    build:
-      context: .
-      target: prod
-    environment:
-      - SERVER_PORT=${SERVER_PORT}
-      - MYSQL_DB=${MYSQL_DB}
-      - MYSQL_DB_DRIVER=${MYSQL_DB_DRIVER}
-    depends_on:
-      - db
-      - elasticsearch
 volumes:
   db:
     driver: local
