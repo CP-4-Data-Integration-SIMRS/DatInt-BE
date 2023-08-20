@@ -32,14 +32,7 @@ func NewLogRepository() *LogRepository {
 
 func (lr *LogRepository) GetLogs() ([]model.LogData, error) {
 	var logs []model.LogData
-	// cfg := elasticsearch.Config{
-	// 	Addresses: []string{"http://localhost:9200"},
-	// }
-
-	// es, err := elasticsearch.NewClient(cfg)
-	// if err != nil {
-	// 	log.Fatalf("Error creating the client: %s", err)
-	// }
+	
 
 	searchBody := `
 	{

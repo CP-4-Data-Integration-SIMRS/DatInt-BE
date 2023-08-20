@@ -30,6 +30,8 @@ func InitMonitorHttpHandler(r *chi.Mux, uc *usecase.HCUsecase) {
 
 func (h *httpHandler) GetMonitorDataHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Add("Content-Type", "application/json")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+
 	data, err := h.hcUsecase.GetAllDatabaseInfo()
 
 	if err != nil {
@@ -56,6 +58,8 @@ func (h *httpHandler) GetMonitorDataHandler(w http.ResponseWriter, r *http.Reque
 
 func (h *httpHandler) GetDBInfo(w http.ResponseWriter, r *http.Request) {
 	w.Header().Add("Content-Type", "application/json")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+
 	dbname := chi.URLParam(r, "dbname")
 
 	data, err := h.hcUsecase.GetDBInfo(dbname)

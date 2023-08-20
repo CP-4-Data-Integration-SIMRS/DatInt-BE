@@ -29,6 +29,7 @@ func InitLogHttpHandler(r *chi.Mux, uc usecase.LogUsecase) {
 
 func (h *httpHandler) GetLogsHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Add("Content-Type", "application/json")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
 	logs, err := h.logUsecase.GetLogs()
 
 	if err != nil {
