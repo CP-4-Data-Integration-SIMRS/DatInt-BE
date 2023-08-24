@@ -8,7 +8,9 @@ import (
 )
 
 type LogUsecase interface {
-	GetLogs() ([]model.LogData, error)
+	//GetLogs() ([]model.LogData, error)
+	//FilterLogs(keyword string) ([]model.LogData, error)
+	GetLogs(status string) ([]model.LogData, error)
 }
 
 type LogUC struct {
@@ -21,11 +23,15 @@ func NewLogUsecase(repo repository.LogRepositoryInterface) *LogUC {
 	}
 }
 
-func (lu *LogUC) GetLogs() ([]model.LogData, error) {
-	logs, err := lu.repo.GetLogs()
-	if err != nil {
-		log.Printf("error getting logs: %s", err.Error())
-		return nil, err
-	}
-	return logs, nil
+
+
+func (lu *LogUC) GetLogs(status string) ([]model.LogData, error) {
+    logs, err := lu.repo.GetLogs(status)
+    if err != nil {
+        // Log pesan kesalahan
+        log.Printf("error getting logs: %s", err.Error())
+        return nil, err
+    }
+
+    return logs, nil
 }

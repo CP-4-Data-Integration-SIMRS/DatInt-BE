@@ -17,7 +17,9 @@ import (
 )
 
 type LogRepositoryInterface interface {
-	GetLogs() ([]model.LogData, error)
+	//GetLogs() ([]model.LogData, error)
+	//FilterLogs(keyword string) ([]model.LogData, error)
+	GetLogs(status string) ([]model.LogData, error)
 }
 
 type LogRepository struct {
@@ -30,7 +32,7 @@ func NewLogRepository() *LogRepository {
 	}
 }
 
-func (lr *LogRepository) GetLogs() ([]model.LogData, error) {
+/*func (lr *LogRepository) GetLogs() ([]model.LogData, error) {
 	var logs []model.LogData
 	
 
@@ -78,4 +80,70 @@ func (lr *LogRepository) GetLogs() ([]model.LogData, error) {
 	}
 
 	return logs, nil
+} */
+
+func (lr *LogRepository) GetLogs(status string) ([]model.LogData, error) {
+	var logs []model.LogData
+	var searchBody string
+
+	if status != "" {
+		// Jika status tidak kosong, kita akan melakukan filter berdasarkan status
+		searchBody = `
+		{
+			"query": {
+				"match": {
+					"Status": " ` + status + `"
+				}
+			}
+		}
+		`
+	} else {
+		// Jika status kosong, kita akan mengambil semua data log
+		searchBody = `
+		{
+			"query": {
+				"match_all": {}
+			}
+		}
+		`
+	}
+
+	req := esapi.SearchRequest{
+		Index: []string{"logindex"},
+		Body:  bytes.NewReader([]byte(searchBody)),
+	}
+
+	res, err := req.Do(context.Background(), lr.es)
+	if err != nil {
+		log.Fatalf("Error performing search request: %s", err)
+	}
+	defer res.Body.Close()
+
+	if res.IsError() {
+		log.Fatalf("Error response: %s", res.String())
+	}
+
+	var response map[string]interface{}
+	if err := json.NewDecoder(res.Body).Decode(&response); err != nil {
+		log.Fatalf("Error parsing the response body: %s", err)
+	}
+
+	hits := response["hits"].(map[string]interface{})["hits"].([]interface{})
+	for _, hit := range hits {
+		source := hit.(map[string]interface{})["_source"].(map[string]interface{})
+
+		log := model.LogData{
+			Healthcare: source["Healthcare"].(string),
+			DBName:     source["DBName"].(string),
+			TBName:     source["TBName"].(string),
+			Status:     source["Status"].(string),
+			DateTime:   time.Now(),
+			CreatedAt:  time.Now(),
+			RecordID:   uuid.New(),
+		}
+		logs = append(logs, log)
+	}
+
+	return logs, nil
 }
+
