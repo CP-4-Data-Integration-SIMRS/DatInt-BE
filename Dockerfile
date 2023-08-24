@@ -15,4 +15,4 @@ WORKDIR /app
 
 COPY --from=build /app/api .
 
-ENTRYPOINT [ "./api" ]
+ENTRYPOINT [ "api" ]
