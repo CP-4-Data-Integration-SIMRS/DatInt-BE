@@ -35,7 +35,7 @@ func (lr *LogRepository) GetLogs(status, search string) ([]model.LogData, error)
 	var searchBody string
 
 	if status != "" && search != "" {
-		// Jika "status" dan "search" keduanya tidak kosong, kita akan membuat query berdasarkan kedua parameter
+		// Jika status dan search  tidak kosong
 		searchBody = `
 		{
 			"query": {
@@ -58,7 +58,7 @@ func (lr *LogRepository) GetLogs(status, search string) ([]model.LogData, error)
 		}
 		`
 	} else if status != "" {
-		// Jika "status" tidak kosong (dan "search" kosong), kita akan membuat query berdasarkan "status"
+		// Jika status tidak kosong 
 		searchBody = `
 		{
 			"query": {
@@ -69,7 +69,7 @@ func (lr *LogRepository) GetLogs(status, search string) ([]model.LogData, error)
 		}
 		`
 	} else if search != "" {
-		// Jika "search" tidak kosong (dan "status" kosong), kita akan membuat query berdasarkan "search"
+		// Jika search tidak kosong 
 		searchBody = `
 		{
 			"query": {
@@ -82,7 +82,7 @@ func (lr *LogRepository) GetLogs(status, search string) ([]model.LogData, error)
 
 		`
 	} else {
-		// Jika kedua parameter "status" dan "search" kosong, kita akan mengambil semua data log
+		// Keduanya kosong
 		searchBody = `
 		{
 			"query": {
