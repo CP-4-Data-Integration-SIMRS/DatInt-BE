@@ -33,10 +33,14 @@ func (h *httpHandler) GetLogsHandler(w http.ResponseWriter, r *http.Request) {
     w.Header().Add("Content-Type", "application/json")
     w.Header().Set("Access-Control-Allow-Origin", "*")
 
-    // Mengambil query parameter "status" dari URL
-    status := r.URL.Query().Get("Status")
 
-    logs, err := h.logUsecase.GetLogs(status)
+	// mengambil status
+    status := r.URL.Query().Get("Filter")
+
+    // mengambil search
+    search := r.URL.Query().Get("Search")
+
+    logs, err := h.logUsecase.GetLogs(status, search)
 
     if err != nil {
         w.WriteHeader(http.StatusInternalServerError)
