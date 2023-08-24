@@ -27,23 +27,34 @@ func InitLogHttpHandler(r *chi.Mux, uc usecase.LogUsecase) {
 	r.Get("/api/v1/logs", handler.GetLogsHandler)
 }
 
+
+
 func (h *httpHandler) GetLogsHandler(w http.ResponseWriter, r *http.Request) {
-	w.Header().Add("Content-Type", "application/json")
-	w.Header().Set("Access-Control-Allow-Origin", "*")
-	logs, err := h.logUsecase.GetLogs()
+    w.Header().Add("Content-Type", "application/json")
+    w.Header().Set("Access-Control-Allow-Origin", "*")
 
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		json.NewEncoder(w).Encode(LogResponse{
-			Status: fmt.Sprintf("error fetching data: %s (%s)", err.Error(), http.StatusText(http.StatusInternalServerError)),
-			Data:   nil,
-		})
-		return
-	}
 
-	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(LogResponse{
-		Status: fmt.Sprintf("Success (%s)", http.StatusText(http.StatusOK)),
-		Data:   logs,
-	})
+	// mengambil status
+    status := r.URL.Query().Get("Filter")
+
+    // mengambil search
+    search := r.URL.Query().Get("Search")
+
+    logs, err := h.logUsecase.GetLogs(status, search)
+
+    if err != nil {
+        w.WriteHeader(http.StatusInternalServerError)
+        json.NewEncoder(w).Encode(LogResponse{
+            Status: fmt.Sprintf("error fetching data: %s (%s)", err.Error(), http.StatusText(http.StatusInternalServerError)),
+            Data:   nil,
+        })
+        return
+    }
+
+    w.WriteHeader(http.StatusOK)
+    json.NewEncoder(w).Encode(LogResponse{
+        Status: fmt.Sprintf("Success (%s)", http.StatusText(http.StatusOK)),
+        Data:   logs,
+    })
 }
+

@@ -17,7 +17,7 @@ import (
 )
 
 type LogRepositoryInterface interface {
-	GetLogs() ([]model.LogData, error)
+	GetLogs(status, search string) ([]model.LogData, error)
 }
 
 type LogRepository struct {
@@ -30,17 +30,68 @@ func NewLogRepository() *LogRepository {
 	}
 }
 
-func (lr *LogRepository) GetLogs() ([]model.LogData, error) {
+func (lr *LogRepository) GetLogs(status, search string) ([]model.LogData, error) {
 	var logs []model.LogData
-	
+	var searchBody string
 
-	searchBody := `
-	{
-		"query": {
-			"match_all": {}
+	if status != "" && search != "" {
+		// Jika status dan search  tidak kosong
+		searchBody = `
+		{
+			"query": {
+				"bool": {
+					"must": [
+						{
+							"match": {
+								"Status": "` + status + `"
+							}
+						},
+						{
+							"multi_match": {
+								"query": "` + search + `",
+								"fields": ["Healthcare", "DBName", "TBName"]
+							}
+						}
+					]
+				}
+			}
 		}
+		`
+	} else if status != "" {
+		// Jika status tidak kosong 
+		searchBody = `
+		{
+			"query": {
+				"match": {
+					"Status": "` + status + `"
+				}
+			}
+		}
+		`
+	} else if search != "" {
+		// Jika search tidak kosong 
+		searchBody = `
+		{
+			"query": {
+				"multi_match": {
+					"query": "` + search + `",
+					"fields": ["Healthcare", "DBName", "TBName"]
+				}
+			}
+		}
+
+		`
+	} else {
+		// Keduanya kosong
+		searchBody = `
+		{
+			"query": {
+				"match_all": {}
+			}
+		}
+		`
 	}
-	`
+
 	req := esapi.SearchRequest{
 		Index: []string{"logindex"},
 		Body:  bytes.NewReader([]byte(searchBody)),
@@ -79,3 +130,4 @@ func (lr *LogRepository) GetLogs() ([]model.LogData, error) {
 
 	return logs, nil
 }
+
