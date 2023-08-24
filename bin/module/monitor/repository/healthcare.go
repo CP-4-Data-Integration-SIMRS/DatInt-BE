@@ -87,7 +87,7 @@ func (h *HCRepository) GetAllTableByDB(dbname string) ([]string, error) {
 }
 
 func (h *HCRepository) FetchNamesFromElasticsearch() ([]string, error) {
-	indexName := "mntr5"
+	indexName := "search-monitor"
 
 	req := esapi.SearchRequest{
 		Index: []string{indexName},

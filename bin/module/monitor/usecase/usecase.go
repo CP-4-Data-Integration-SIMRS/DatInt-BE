@@ -123,7 +123,7 @@ func (hu *HCUsecase) GetDbNameFromElastic() ([]string, error){
 }
 
 func (hu *HCUsecase) SearchDBName(dbname string) (model.DatabaseInfo, error) {
-	db, err := hu.repo.SearchDocumentsByDBName("mntr5", dbname)
+	db, err := hu.repo.SearchDocumentsByDBName("search-monitor", dbname)
 
 	if err != nil {
 		return model.DatabaseInfo{}, err
