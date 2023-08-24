@@ -11,6 +11,7 @@ import (
 	repoLog "github.com/vier21/simrs-cdc-monitoring/bin/module/log/repository" // Import the log repository with alias
 	usecaseLog "github.com/vier21/simrs-cdc-monitoring/bin/module/log/usecase" // Import the log usecase with alias
 	hm "github.com/vier21/simrs-cdc-monitoring/bin/module/monitor/handler"
+	kafka "github.com/vier21/simrs-cdc-monitoring/bin/module/monitor/kafka/producer"
 	"github.com/vier21/simrs-cdc-monitoring/bin/module/monitor/repository"
 	"github.com/vier21/simrs-cdc-monitoring/bin/module/monitor/usecase"
 	"github.com/vier21/simrs-cdc-monitoring/bin/pkg/elastic"
@@ -43,11 +44,16 @@ func main() {
 }
 
 func RunServer(c *chi.Mux) {
+
 	monitorRepo := repository.NewHealthCareRepository()
 	monitorUsecase := usecase.NewMonitorUsecase(monitorRepo)
+	producer := kafka.NewProducer()
 	hm.InitMonitorHttpHandler(c, monitorUsecase)
+
 
 	logRepo := repoLog.NewLogRepository()
 	logUsecase := usecaseLog.NewLogUsecase(logRepo)
 	hl.InitLogHttpHandler(c, logUsecase)
+
+	producer.RunCron()
 }

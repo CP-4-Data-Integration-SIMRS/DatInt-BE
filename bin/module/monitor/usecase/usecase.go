@@ -12,6 +12,8 @@ type MonitoringUsecase interface {
 	GetDBTableInfo(dbname, tbname string) ([]model.Table, error)
 	GetAllTableInfoByDB(dbname string) ([]model.Table, error)
 	GetDBInfo(dbname string) (model.DatabaseInfo, error)
+	SearchDBName(dbname string) (model.DatabaseInfo, error)
+	GetDbNameFromElastic() ([]string, error)
 }
 
 type HCUsecase struct {
@@ -111,3 +113,23 @@ func (hu *HCUsecase) GetDBInfo(dbname string) (model.DatabaseInfo, error) {
 		TableInfo:  tableinfo,
 	}, nil
 }
+
+func (hu *HCUsecase) GetDbNameFromElastic() ([]string, error){
+	dbnames, err := hu.repo.FetchNamesFromElasticsearch()
+	if err != nil {
+		return []string{}, err
+	}
+	return dbnames, nil
+}
+
+func (hu *HCUsecase) SearchDBName(dbname string) (model.DatabaseInfo, error) {
+	db, err := hu.repo.SearchDocumentsByDBName("mntr5", dbname)
+
+	if err != nil {
+		return model.DatabaseInfo{}, err
+	}
+
+	return db, err
+}
+
+
