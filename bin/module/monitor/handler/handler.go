@@ -182,8 +182,36 @@ func (h *httpHandler) PushToBrokerConfluent(w http.ResponseWriter, r *http.Reque
 func (h *httpHandler) GetAllDBNameHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Add("Content-Type", "application/json")
 	w.Header().Set("Access-Control-Allow-Origin", "*")
+	dbname := r.URL.Query().Get("dbname")
 
-	dbnames, err := h.hcUsecase.GetDbNameFromElastic()
+	if dbname == "" {
+		dbnames, err := h.hcUsecase.GetDbNameFromElastic()
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			json.NewEncoder(w).Encode(MonitorResponse{
+				Status: fmt.Sprintf("error fetching data: %s (%s)", err.Error(), strconv.Itoa(http.StatusInternalServerError)),
+				Data:   nil,
+			})
+			return
+		}
+
+		resp := MonitorResponse{
+			Status: fmt.Sprintf("Success (%s)", strconv.Itoa(http.StatusOK)),
+			Data:   dbnames,
+		}
+
+		if err := json.NewEncoder(w).Encode(resp); err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			json.NewEncoder(w).Encode(MonitorResponse{
+				Status: fmt.Sprintf("error fetching data: %s (%s)", err.Error(), strconv.Itoa(http.StatusInternalServerError)),
+				Data:   nil,
+			})
+			return
+		}
+		return
+
+	}
+	dbs, err := h.hcUsecase.SearchDBName(dbname)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		json.NewEncoder(w).Encode(MonitorResponse{
@@ -195,7 +223,7 @@ func (h *httpHandler) GetAllDBNameHandler(w http.ResponseWriter, r *http.Request
 
 	resp := MonitorResponse{
 		Status: fmt.Sprintf("Success (%s)", strconv.Itoa(http.StatusOK)),
-		Data:   dbnames,
+		Data:   dbs,
 	}
 
 	if err := json.NewEncoder(w).Encode(resp); err != nil {
@@ -214,7 +242,7 @@ func (h *httpHandler) SearchDBNameFromElastic(w http.ResponseWriter, r *http.Req
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	dbname := r.URL.Query().Get("dbname")
 
-	dbnames, err := h.hcUsecase.SearchDBName(dbname)
+	dbs, err := h.hcUsecase.SearchDBName(dbname)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		json.NewEncoder(w).Encode(MonitorResponse{
@@ -226,7 +254,7 @@ func (h *httpHandler) SearchDBNameFromElastic(w http.ResponseWriter, r *http.Req
 
 	resp := MonitorResponse{
 		Status: fmt.Sprintf("Success (%s)", strconv.Itoa(http.StatusOK)),
-		Data:   dbnames,
+		Data:   dbs,
 	}
 
 	if err := json.NewEncoder(w).Encode(resp); err != nil {

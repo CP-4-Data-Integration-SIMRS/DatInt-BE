@@ -43,13 +43,13 @@ func (lr *LogRepository) GetLogs(status, search string) ([]model.LogData, error)
 					"must": [
 						{
 							"match": {
-								"Status": "` + status + `"
+								"status": "` + status + `"
 							}
 						},
 						{
 							"multi_match": {
 								"query": "` + search + `",
-								"fields": ["Healthcare", "DBName", "TBName"]
+								"fields": ["healthcare", "dbname", "tbame"]
 							}
 						}
 					]
@@ -75,7 +75,7 @@ func (lr *LogRepository) GetLogs(status, search string) ([]model.LogData, error)
 			"query": {
 				"multi_match": {
 					"query": "` + search + `",
-					"fields": ["Healthcare", "DBName", "TBName"]
+					"fields": ["healthcare", "dbname", "tbname"]
 				}
 			}
 		}
@@ -93,7 +93,7 @@ func (lr *LogRepository) GetLogs(status, search string) ([]model.LogData, error)
 	}
 
 	req := esapi.SearchRequest{
-		Index: []string{"logindex"},
+		Index: []string{"search-log"},
 		Body:  bytes.NewReader([]byte(searchBody)),
 	}
 
@@ -117,10 +117,10 @@ func (lr *LogRepository) GetLogs(status, search string) ([]model.LogData, error)
 		source := hit.(map[string]interface{})["_source"].(map[string]interface{})
 
 		log := model.LogData{
-			Healthcare: source["Healthcare"].(string),
-			DBName:     source["DBName"].(string),
-			TBName:     source["TBName"].(string),
-			Status:     source["Status"].(string),
+			Healthcare: source["healthcare"].(string),
+			DBName:     source["dbname"].(string),
+			TBName:     source["tbname"].(string),
+			Status:     source["status"].(string),
 			DateTime:   time.Now(),
 			CreatedAt:  time.Now(),
 			RecordID:   uuid.New(),

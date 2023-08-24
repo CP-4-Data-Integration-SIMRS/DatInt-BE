@@ -4,9 +4,10 @@ WORKDIR /app
 COPY . .
 
 COPY go.mod go.sum ./
-RUN go mod download 
+RUN go mod download
+RUN go mod verify
 
-RUN CGO_ENABLED=0 GOOS=linux go build -a -o api bin/cmd/main.go
+RUN go build -a -o api bin/cmd/main.go
 
 FROM alpine:latest AS prod
 

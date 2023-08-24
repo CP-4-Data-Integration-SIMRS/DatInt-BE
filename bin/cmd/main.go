@@ -7,11 +7,10 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	_ "github.com/go-sql-driver/mysql"
-	hl "github.com/vier21/simrs-cdc-monitoring/bin/module/log/handler"         // Import the log handler
-	repoLog "github.com/vier21/simrs-cdc-monitoring/bin/module/log/repository" // Import the log repository with alias
-	usecaseLog "github.com/vier21/simrs-cdc-monitoring/bin/module/log/usecase" // Import the log usecase with alias
+	hl "github.com/vier21/simrs-cdc-monitoring/bin/module/log/handler"
+	repoLog "github.com/vier21/simrs-cdc-monitoring/bin/module/log/repository"
+	usecaseLog "github.com/vier21/simrs-cdc-monitoring/bin/module/log/usecase"
 	hm "github.com/vier21/simrs-cdc-monitoring/bin/module/monitor/handler"
-	kafka "github.com/vier21/simrs-cdc-monitoring/bin/module/monitor/kafka/producer"
 	"github.com/vier21/simrs-cdc-monitoring/bin/module/monitor/repository"
 	"github.com/vier21/simrs-cdc-monitoring/bin/module/monitor/usecase"
 	"github.com/vier21/simrs-cdc-monitoring/bin/pkg/elastic"
@@ -42,7 +41,7 @@ func main() {
 }
 
 func RunServer(c *chi.Mux) {
-	cron := kafka.NewProducer()
+
 	monitorRepo := repository.NewHealthCareRepository()
 	monitorUsecase := usecase.NewMonitorUsecase(monitorRepo)
 	hm.InitMonitorHttpHandler(c, monitorUsecase)
@@ -50,7 +49,5 @@ func RunServer(c *chi.Mux) {
 	logRepo := repoLog.NewLogRepository()
 	logUsecase := usecaseLog.NewLogUsecase(logRepo)
 	hl.InitLogHttpHandler(c, logUsecase)
-
-	cron.RunCron()
 
 }

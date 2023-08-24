@@ -21,15 +21,12 @@ func NewLogUsecase(repo repository.LogRepositoryInterface) *LogUC {
 	}
 }
 
-
-
 func (lu *LogUC) GetLogs(status, search string) ([]model.LogData, error) {
-    logs, err := lu.repo.GetLogs(status, search)
-    if err != nil {
-        // Log pesan kesalahan
-        log.Printf("error getting logs: %s", err.Error())
-        return nil, err
-    }
+	logs, err := lu.repo.GetLogs(status, search)
+	if err != nil {
+		log.Printf("error getting logs: %s", err.Error())
+		return nil, err
+	}
 
-    return logs, nil
+	return logs, nil
 }

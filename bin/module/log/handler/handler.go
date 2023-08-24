@@ -35,10 +35,10 @@ func (h *httpHandler) GetLogsHandler(w http.ResponseWriter, r *http.Request) {
 
 
 	// mengambil status
-    status := r.URL.Query().Get("Filter")
+    status := r.URL.Query().Get("filter")
 
     // mengambil search
-    search := r.URL.Query().Get("Search")
+    search := r.URL.Query().Get("search")
 
     logs, err := h.logUsecase.GetLogs(status, search)
 
