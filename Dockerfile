@@ -13,7 +13,7 @@ FROM alpine:latest AS prod
 
 WORKDIR /app
 
-COPY --from=build /app/api .
+COPY --from=build /app/api ./api
 EXPOSE 3030
-ENTRYPOINT [ "api" ]
+ENTRYPOINT [ "./api" ]
 
