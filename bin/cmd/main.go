@@ -15,12 +15,10 @@ import (
 	"github.com/vier21/simrs-cdc-monitoring/bin/module/monitor/repository"
 	"github.com/vier21/simrs-cdc-monitoring/bin/module/monitor/usecase"
 	"github.com/vier21/simrs-cdc-monitoring/bin/pkg/elastic"
-	"github.com/vier21/simrs-cdc-monitoring/bin/pkg/mysql"
 	"github.com/vier21/simrs-cdc-monitoring/config"
 )
 
 func main() {
-	mysql.InitMysqlDB()
 	elastic.InitElastic()
 
 	m := chi.NewRouter()
@@ -44,16 +42,15 @@ func main() {
 }
 
 func RunServer(c *chi.Mux) {
-
+	cron := kafka.NewProducer()
 	monitorRepo := repository.NewHealthCareRepository()
 	monitorUsecase := usecase.NewMonitorUsecase(monitorRepo)
-	producer := kafka.NewProducer()
 	hm.InitMonitorHttpHandler(c, monitorUsecase)
-
 
 	logRepo := repoLog.NewLogRepository()
 	logUsecase := usecaseLog.NewLogUsecase(logRepo)
 	hl.InitLogHttpHandler(c, logUsecase)
 
-	producer.RunCron()
+	cron.RunCron()
+
 }

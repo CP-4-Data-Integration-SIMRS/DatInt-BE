@@ -17,6 +17,8 @@ import (
 	"github.com/vier21/simrs-cdc-monitoring/bin/pkg/elastic"
 )
 
+
+
 func main() {
 	err := elastic.InitElastic()
 	if err != nil {
@@ -84,9 +86,9 @@ func connectConsumer(brokersUrl []string) (sarama.Consumer, error) {
 
 func indexBulkData(msg []byte) error {
 	cfg := elasticsearch.Config{
-		Addresses: []string{"http://localhost:9200"}, // Elasticsearch server address
+		CloudID: "es-dbt:YXNpYS1zb3V0aGVhc3QxLmdjcC5lbGFzdGljLWNsb3VkLmNvbSRkMjYyNWJjNzY4NjA0ZDM1YTkzOWQyNWU2ZjI0NmJjMCQyMWI3Mjg3MjY2OWY0OTBmOTU3MTk1MjQ4ZGQ3YWNmNg==",
+		APIKey:  "SDZ0Nko0b0JyTnVOd2FaWVN1NHI6WHhhZkNYQ1RSb1dtcU0zWUN4YUQxdw==",
 	}
-
 	client, err := elasticsearch.NewClient(cfg)
 	if err != nil {
 		log.Fatalf("Error creating the client: %s", err)
@@ -129,56 +131,11 @@ func indexBulkData(msg []byte) error {
 	return nil
 }
 
-func PushToElastic(message []byte) error {
-	cfg := elasticsearch.Config{
-		Addresses: []string{"http://localhost:9200"}, // Elasticsearch server address
-	}
-
-	client, err := elasticsearch.NewClient(cfg)
-	if err != nil {
-		log.Fatalf("Error creating the client: %s", err)
-	}
-	var data model.DatabaseInfo
-
-	err = json.Unmarshal(message, &data)
-	if err != nil {
-		log.Printf("error sending to elastic %s \n", err.Error())
-		return err
-	}
-
-	docJSON, err := json.Marshal(data)
-	if err != nil {
-		log.Printf("error sending to elastic %s \n", err.Error())
-		return err
-	}
-
-	req := esapi.IndexRequest{
-		Index:      "monitoring",
-		DocumentID: "1",
-		Body:       strings.NewReader(string(docJSON)),
-		Refresh:    "true",
-	}
-
-	res, err := req.Do(context.Background(), client)
-
-	if err != nil {
-		log.Fatalf("Error indexing document: %s", err)
-		return err
-	}
-	defer res.Body.Close()
-
-	if res.IsError() {
-		log.Fatalf("Error response: %s", res)
-		return err
-	}
-
-	fmt.Println("Document indexed or updated successfully")
-	return nil
-}
 
 func indexOrUpdateDocuments(msg []byte) error {
 	cfg := elasticsearch.Config{
-		Addresses: []string{"http://localhost:9200"}, // Elasticsearch server address
+		CloudID: "es-dbt:YXNpYS1zb3V0aGVhc3QxLmdjcC5lbGFzdGljLWNsb3VkLmNvbSRkMjYyNWJjNzY4NjA0ZDM1YTkzOWQyNWU2ZjI0NmJjMCQyMWI3Mjg3MjY2OWY0OTBmOTU3MTk1MjQ4ZGQ3YWNmNg==",
+		APIKey:  "SDZ0Nko0b0JyTnVOd2FaWVN1NHI6WHhhZkNYQ1RSb1dtcU0zWUN4YUQxdw==",
 	}
 
 	client, err := elasticsearch.NewClient(cfg)
@@ -203,7 +160,7 @@ func indexOrUpdateDocuments(msg []byte) error {
 		}
 
 		req := esapi.IndexRequest{
-			Index:      "mntr5",
+			Index:      "search-monitor",
 			DocumentID: docID,
 			Body:       strings.NewReader(string(itemJSON)),
 			Refresh:    "true",
@@ -216,7 +173,7 @@ func indexOrUpdateDocuments(msg []byte) error {
 		defer res.Body.Close()
 
 		if res.IsError() {
-			return fmt.Errorf("Error indexing/updating document: %s", res.Status())
+			return fmt.Errorf("error indexing/updating document: %s", res.Status())
 		}
 	}
 	fmt.Println("Document indexed or updated successfully")
@@ -224,18 +181,4 @@ func indexOrUpdateDocuments(msg []byte) error {
 	return nil
 }
 
-func documentExists(client *elasticsearch.Client, docname string) (bool, error) {
-	res, err := client.Exists("mntr", docname)
-	if err != nil {
-		return false, err
-	}
-	defer res.Body.Close()
 
-	if res.StatusCode == 404 {
-		return false, nil
-	} else if res.IsError() {
-		return false, fmt.Errorf("Error checking document existence: %s", res.Status())
-	}
-
-	return true, nil
-}

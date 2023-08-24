@@ -19,6 +19,7 @@ services:
     environment:
       - discovery.type=single-node
       - xpack.security.enabled=false
+  
 volumes:
   db:
     driver: local
