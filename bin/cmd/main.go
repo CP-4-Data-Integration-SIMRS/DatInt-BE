@@ -24,7 +24,7 @@ func main() {
 	RunServer(m)
 
 	server := http.Server{
-		Addr:         "0.0.0.0:3030",
+		Addr:         "0.0.0.0:" + "3030",
 		Handler:      m,
 		IdleTimeout:  10 * time.Second,
 		ReadTimeout:  15 * time.Second,
