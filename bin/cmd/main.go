@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/go-chi/chi/v5"
@@ -23,8 +24,10 @@ func main() {
 
 	RunServer(m)
 
+	port := envPortOr("3030")
+
 	server := http.Server{
-		Addr:         "0.0.0.0:" + "3030",
+		Addr:         port,
 		Handler:      m,
 		IdleTimeout:  10 * time.Second,
 		ReadTimeout:  15 * time.Second,
@@ -49,4 +52,13 @@ func RunServer(c *chi.Mux) {
 	logUsecase := usecaseLog.NewLogUsecase(logRepo)
 	hl.InitLogHttpHandler(c, logUsecase)
 
+}
+
+func envPortOr(port string) string {
+	// If `PORT` variable in environment exists, return it
+	if envPort := os.Getenv("PORT"); envPort != "" {
+		return ":" + envPort
+	}
+	// Otherwise, return the value of `port` variable from function argument
+	return ":" + port
 }
