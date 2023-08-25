@@ -14,7 +14,6 @@ import (
 	"github.com/vier21/simrs-cdc-monitoring/bin/module/monitor/repository"
 	"github.com/vier21/simrs-cdc-monitoring/bin/module/monitor/usecase"
 	"github.com/vier21/simrs-cdc-monitoring/bin/pkg/elastic"
-	"github.com/vier21/simrs-cdc-monitoring/config"
 )
 
 func main() {
@@ -32,7 +31,7 @@ func main() {
 		WriteTimeout: 10 * time.Second,
 	}
 
-	log.Printf("Server start on localhost%s \n", config.GetConfig().ServerPort)
+	log.Printf("Server start on %s \n", server.Addr)
 
 	if err := server.ListenAndServe(); err == http.ErrServerClosed {
 		log.Fatalf("error starting server: %s", err.Error())
