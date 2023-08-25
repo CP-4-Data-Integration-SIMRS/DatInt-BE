@@ -3,24 +3,23 @@ module github.com/vier21/simrs-cdc-monitoring
 go 1.19
 
 require (
+	github.com/IBM/sarama v1.41.0
+	github.com/confluentinc/confluent-kafka-go/v2 v2.2.0
+	github.com/elastic/go-elasticsearch/v7 v7.17.10
 	github.com/elastic/go-elasticsearch/v8 v8.9.0
 	github.com/go-chi/chi/v5 v5.0.10
+	github.com/go-co-op/gocron v1.32.1
 	github.com/go-sql-driver/mysql v1.7.1
 	github.com/google/uuid v1.3.0
 	github.com/jmoiron/sqlx v1.3.5
-	github.com/joho/godotenv v1.5.1
 )
 
 require (
-	github.com/IBM/sarama v1.41.0 // indirect
-	github.com/confluentinc/confluent-kafka-go/v2 v2.2.0 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/eapache/go-resiliency v1.4.0 // indirect
 	github.com/eapache/go-xerial-snappy v0.0.0-20230731223053-c322873962e3 // indirect
 	github.com/eapache/queue v1.1.0 // indirect
 	github.com/elastic/elastic-transport-go/v8 v8.0.0-20230329154755-1a3c63de0db6 // indirect
-	github.com/elastic/go-elasticsearch/v7 v7.17.10 // indirect
-	github.com/go-co-op/gocron v1.32.1 // indirect
 	github.com/golang/snappy v0.0.4 // indirect
 	github.com/hashicorp/errwrap v1.1.0 // indirect
 	github.com/hashicorp/go-multierror v1.1.1 // indirect
